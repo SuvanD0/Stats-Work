@@ -1,0 +1,241 @@
+---
+title: "Lab_2_Dommeti1"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+
+seed is set the same for all results so each iteration will create reproducible results
+
+## part (a)
+
+```{r}
+#Gamma(Alpha, Beta)
+#Mu = alpha/beta
+#Sigma^2 = alpha/beta^2
+
+set.seed(333)
+N.mc <- 10000
+sample.size <- 4
+xbar_vector <- c() 
+
+for (i in 1:N.mc) {
+  samp <- rgamma(sample.size, 2, 0.5)
+  
+  #Finding mean of every sample and then putting all means in the vector
+  xbar <- mean(samp)
+  xbar_vector[i] <- xbar
+}
+
+hist(xbar_vector, 
+     main = "Sampling Distribution of mean of Gamma(2, 0.5)\n n = 4",
+     xlab = "Mean value",
+     col = "mistyrose3",
+     breaks = 50)
+```
+
+The histogram of the sampaling distribution looks right skewed, CLT does not come into play here because our N was not large enough.
+
+## part (b)
+
+```{r}
+set.seed(333)
+N.mc <- 50000
+sample.size <- 4
+xbar_vector <- c() 
+
+for (i in 1:N.mc) {
+  samp <- rgamma(sample.size, 2, 0.5)
+  
+  #Finding mean of every sample and then putting all means in the vector
+  xbar <- mean(samp)
+  xbar_vector[i] <- xbar
+}
+
+hist(xbar_vector, 
+     main = "Sampling Distribution of mean of Gamma(2, 0.5)\n n = 4",
+     xlab = "Mean value",
+     col = "mistyrose3",
+     breaks = 50)
+```
+
+The shape remains about the same, the only change is the frequencies of each value. N remains unchanged answer remains unchaged
+
+## part (c)
+
+```{r}
+set.seed(333)
+N.mc <- 10000
+sample.size <- 80
+xbar_vector <- c() 
+
+for (i in 1:N.mc) {
+  samp <- rgamma(sample.size, 2, 0.5)
+  
+  #Finding mean of every sample and then putting all means in the vector
+  xbar <- mean(samp)
+  xbar_vector[i] <- xbar
+}
+
+hist(xbar_vector, 
+     main = "Sampling Distribution of mean of Gamma(2, 0.5)\n n = 80",
+     xlab = "Mean value",
+     col = "mistyrose3",
+     breaks = 50)
+```
+
+Since the new N is greater (80), our sampling distribution looks symmetrical and approximately normal.
+
+## part (d)
+
+```{r}
+alpha <- 2
+beta <- 0.5
+N <-  80
+
+# true vs sample mean/std
+alpha/beta
+mean(xbar_vector)
+
+alpha/beta^2/ N
+var(xbar_vector)
+```
+
+The distribution of $\bar{X}$ is $N(4,0.1) = N(\frac{\alpha}{\beta}, \frac{\alpha}{\beta^2n})$
+
+## part (e)
+
+```{r}
+# replicate function
+
+cauchy_clt <- function(n){
+  samp <- rcauchy(n)
+  xbar <- mean(samp)
+  return(xbar)
+}
+
+# replicate(repetitions, function)
+xbar_vector <- replicate(10000, cauchy_clt(50))
+hist(xbar_vector, 
+     main = "Sampling Distribution of mean of Cauchy(0, 1)\n n = 50",
+     xlab = "Mean value",
+     col = "mistyrose3")
+```
+
+# Problem 2
+
+## part (a)
+
+```{r}
+set.seed(333)
+
+pois.samp <-  rpois(5000,7)
+barplot <- barplot(table(pois.samp),
+                   main = "Bar plot for Poisson(7), n = 5000",
+                   xlab = "number",
+                   ylab = "frequency",
+                   col = "mistyrose3")
+```
+
+## part (b)
+
+```{r}
+pMean <- mean(pois.samp)
+pVar <- var(pois.samp)
+
+print(pMean)
+print(pVar)
+```
+
+Both values are close to the true mean and variance given by $\lambda = 7$. The better approximation would be the sample mean as its unbiased.
+
+## part (c)
+
+Means are unbiased estimators since over a large number of iterations they don't repetitively overestimate or underestimate. In a poisson distribution this makes mean the better measure
+
+# Problem 3
+
+## part (a)
+
+```{r}
+# A is normal, B is Chi-Squared, C is exponential
+
+# Expectation of A,B,C
+Expecation_A <- 6
+Expecation_B <- 5
+Expecation_C <- 1/10
+
+# Expectation of X
+Expecation_X <- Expecation_A + 2*Expecation_B - 3*Expecation_C
+Expecation_X
+
+# Variance of A,B,C
+var_A <- 2^2
+var_B <- 2*5
+var_C <- 1/(10^2)
+
+# Variance of X
+var_X <- var_A + 4*var_B + 9*var_C
+var_X
+```
+
+## part (b)
+
+```{r}
+set.seed(12345)
+
+A <- rnorm(5000, 6, 2)
+B <- rchisq(5000, 5)
+C <- rexp(5000, 10)
+
+# Simulating X
+X <- A + 2*B - 3*C
+
+
+hist(X,
+     main = "Histogram of X",
+     col = "mistyrose3")
+
+
+sample_mean <- mean(X)
+sample_mean
+
+
+sample_var <- var(X)
+sample_var
+```
+
+The sample mean and variance are really close to the true parameters we just calculated
+
+## part (c)
+
+```{r}
+pA <- pnorm(3.5, mean = 6, sd = 2)
+pA
+```
+
+## part (d)
+
+```{r}
+less_than_3_5 <- sum(A < 3.5)
+
+pA2 <- less_than_3_5/length(A) 
+pA2
+```
+
+They're pretty close to each other which is expected since A sample is modeling the real distribution of A
+
+## part (e)
+
+```{r}
+greater_than_10 <- sum(X > 10)
+
+pX <- greater_than_10/length(X) 
+pX
+```

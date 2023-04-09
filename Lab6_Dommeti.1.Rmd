@@ -1,0 +1,375 @@
+---
+title: "Lab6_Dommeti.1"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+
+## part (a)
+
+If we have $x_1, x_2, x_3, ..., x_n$ iid from a $N(\mu, \sigma^)$ distribution, then the sampling distribution of $\bar{x}$ is $N(\mu , \sigma^2/n)$
+
+## part (b)
+
+```{r}
+
+set.seed(12321)
+
+N.mc <- 50000
+n <- 40
+
+mu <- 20
+sigma <- sqrt(4)
+
+xbar.storage <- c()
+for (i in 1:N.mc) {
+  samp <- rnorm(n, mean = mu, sd = sigma)
+  
+  xbar.storage[i] <- mean(samp)
+}
+
+hist(xbar.storage, 
+     col = "mistyrose3", 
+     breaks = 50,
+     main = "Distribution of xbar")
+
+
+```
+
+```{r}
+mean(xbar.storage)
+var(xbar.storage)
+```
+
+Here, the sampling distribution of $\bar{x}$ is $N(20, 0.1)$
+
+## part (c)
+
+```{r}
+set.seed(12321)
+
+N.mc <- 50000
+n <- 4
+
+mu <- 20
+sigma <- sqrt(4)
+
+xbar.storage <- c()
+for (i in 1:N.mc) {
+  samp <- rnorm(n, mean = mu, sd = sigma)
+  
+  xbar.storage[i] <- mean(samp)
+}
+
+hist(xbar.storage, 
+     col = "mistyrose3", 
+     breaks = 50,
+     main = "Distribution of xbar")
+```
+
+```{r}
+mean(xbar.storage)
+var(xbar.storage)
+```
+
+Here, the sampling distribution of $\bar{x}$ is $N(20, 1)$
+
+## part (d)
+
+No matter the sample size, the sampling distribution of $\bar{x}$ will always be normal since $x_1, x_2, ... x_n$ are normal. The sample size will affect the variance of the normal distribution.
+
+## part (e)
+
+```{r}
+set.seed(888)
+
+N.mc <- 50000
+n <- 9
+
+mu <- 40
+sigma <- sqrt(36)
+
+xbar.minus.40.storage <- c()
+
+for (i in 1:N.mc) {
+  samp <- rnorm(n, mean = mu, sd = sigma)
+  
+  xbar.minus.40.storage[i] <- mean(samp) - mu
+}
+
+hist(xbar.minus.40.storage, 
+     col = "mistyrose3", 
+     breaks = 50,
+     main = "Distribution of xbar minus 40")
+```
+
+```{r}
+mean(xbar.minus.40.storage)
+var(xbar.minus.40.storage)
+```
+
+sampling distribution of $\bar{x}$ - 40 looks normal. And it follows a $N(0, 4)$ distribution
+
+## part (f)
+
+```{r}
+set.seed(888)
+
+N.mc <- 50000
+n <- 9
+
+mu <- 40
+sigma <- sqrt(36)
+
+estimator.storage <-c()
+
+for (i in 1:N.mc) {
+  samp <-  rnorm(n, mean = mu, sd = sigma)
+  
+  estimator.storage[i] <- (mean(samp) - 40) / (sigma/sqrt(n) )
+}
+
+hist(estimator.storage, 
+     col = "mistyrose3",
+     breaks = 50)
+
+
+```
+
+```{r}
+mean(estimator.storage)
+var(estimator.storage)
+```
+
+Yes, the sampling distribution of $\dfrac{\bar{x}-40}{6/\sqrt 9}$ looks normal here
+
+And the distribution is a standard normal distribution $N(0,1)$
+
+# Problem 2
+
+## part (a)
+
+The Central Limit Theorem (CLT) states that for a large sample size n, the sampling distribution of the sample mean is approximately normally distributed, regardless of the underlying distribution of the population, as long as the sample is drawn from a population with a finite mean and variance.
+
+## part (b)
+
+Given $x_1,...,x_n$ is an $iid$ sample from a chi-squared distribution with $\lambda$ degrees of freedom, the sampling distribution of the sample mean $\bar{x}$  approaches a normal distribution with mean $lambda$ and variance $\dfrac{\lambda}{n}$ as n becomes larger.
+
+## part (c)
+
+```{r}
+set.seed(12321)
+
+N.mc <- 50000
+n <- 40
+lambda <- 8
+
+estimator.storage <-c()
+
+for (i in 1:N.mc) {
+  samp <- rchisq(n, lambda)
+  
+  estimator.storage[i] <- (mean(samp) - lambda) / sqrt((2*lambda)/n)
+}
+
+hist(estimator.storage, 
+     col = "mistyrose3",
+     breaks = 50,
+     main = "Sampling Distribution of Sample Mean",
+     xlab = "Estimator Value")
+
+
+```
+
+```{r}
+mean(estimator.storage)
+var(estimator.storage)
+```
+
+
+the sampling distribution of the sample mean $\bar{x}$ looks approximately normal. This is consistent with the Central Limit Theorem
+
+## part (d)
+
+```{r}
+set.seed(12321)
+
+N.mc <- 50000
+n <- 4
+lambda <- 8
+
+estimator.storage <-c()
+
+for (i in 1:N.mc) {
+  samp <- rchisq(n, lambda)
+  
+  estimator.storage[i] <- (mean(samp) - lambda) / sqrt((2*lambda)/n)
+}
+
+hist(estimator.storage, 
+     col = "mistyrose3",
+     breaks = 50,
+     main = "Sampling Distribution of Sample Mean",
+     xlab = "Estimator Value")
+
+
+```
+
+```{r}
+mean(estimator.storage)
+var(estimator.storage)
+```
+
+
+the sampling distribution of the sample mean $\bar{x}$ does not look normal. The sample size is not big enough
+
+## part (e)
+
+Central limit theorem allows part c to normalize but is also the reason part d does not normalize
+
+## part (f)
+
+```{r}
+set.seed(12321)
+
+N.mc <- 50000
+n <- 40
+lambda <- 8
+
+estimator.storage <-c()
+
+for (i in 1:N.mc) {
+  samp <- rchisq(n, lambda)
+  
+  estimator.storage[i] <- mean(samp) - 8
+}
+
+hist(estimator.storage, 
+     col = "mistyrose3",
+     breaks = 50,
+     main = "Sampling Distribution of Sample Mean Minus 8",
+     xlab = "Estimator Value")
+
+```
+
+```{r}
+mean(estimator.storage)
+var(estimator.storage)
+```
+
+
+distribution of $\bar{x} - 8$ is approximately normal with mean 0 and standard deviation 1, regardless of the underlying distribution of the population.
+
+## part (g)
+
+```{r}
+set.seed(888)
+
+N.mc <- 50000
+n <- 40
+lambda <- 8
+
+estimator.storage <-c()
+
+for (i in 1:N.mc) {
+  samp <- rchisq(n, lambda)
+  
+  estimator.storage[i] <- ((mean(samp) - 8) * 4) / sqrt(40)
+}
+
+hist(estimator.storage, 
+     col = "mistyrose3",
+     breaks = 50,
+     main = "Sampling Distribution of Estimator",
+     xlab = "Estimator Value")
+
+
+```
+
+The histogram looks approximately normal.
+
+The sampling distribution of $(\bar{x} - 8) \frac{4}{\sqrt{40}}$ looks normal.
+
+```{r}
+mean(estimator.storage)
+var(estimator.storage)
+```
+
+# Problem 3
+
+## part (a)
+
+The formula for the sample standard deviation s is: $s= \sqrt{\frac{\sum_{i=1}^{n}(x_i-\bar{x})^2}{n-1}}$
+
+## part (b)
+
+```{r}
+set.seed(888)
+
+N.mc <- 50000
+n <- 9
+mu <- 40
+sigma <- 6
+
+estimator.storage <-c()
+
+for (i in 1:N.mc) {
+  samp <- rnorm(n, mu, sigma)
+  
+  estimator.storage[i] <- (mean(samp) - mu) / (sd(samp) / sqrt(n))
+}
+
+hist(estimator.storage, 
+     col = "mistyrose3",
+     breaks = 50,
+     xlab = "Estimator Value")
+
+```
+
+The sampling distribution of $\frac{\bar{x}-\mu}{s/\sqrt{n}}$ looks normal, the histogram should have a bell-shaped, symmetric, and unimodal distribution. However, the tails of the distribution should be longer than those of a normal distribution.
+
+```{r}
+mean(estimator.storage)
+var(estimator.storage)
+```
+
+
+```{r}
+set.seed(888)
+
+N.mc <- 50000
+mu <- 40
+sigma <- 6
+
+n_values <- c(9, 20, 30)
+
+for (n in n_values) {
+  estimator.storage <-c()
+
+  for (i in 1:N.mc) {
+    samp <- rnorm(n, mu, sigma)
+
+    estimator.storage[i] <- (mean(samp) - mu) / (sd(samp) / sqrt(n))
+  }
+
+  hist(estimator.storage, 
+       col = "mistyrose3",
+       breaks = 50,
+       xlab = "Estimator Value")
+}
+
+```
+
+the sampling distribution of $(\bar{x}-\mu)/(s/\sqrt{n})$ becomes closer to a normal distribution. When the sample size is smaller the distribution has longer tails and is less bell shaped, as the sample size increases the distribution is more bell shaped and symetric
+
+```{r}
+mean(estimator.storage)
+var(estimator.storage)
+```
+

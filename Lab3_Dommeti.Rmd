@@ -1,0 +1,130 @@
+---
+title: "Lab3_Dommeti"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+
+```{r}
+set.seed(93415)
+size <- 10
+mu <- 100
+sigma <- 5
+
+
+##Function to find simualtion mean
+
+s2_fun <- function(size){
+  s2_storage <- c()
+
+  for(i in 1:10000){
+    samp <- rnorm(size, mean = mu,sd =  sigma)
+    xbar <- mean(samp)
+    s2 <-  sum((samp - xbar)^2) / size
+    s2_storage[i] <-  s2
+  }
+  return(mean(s2_storage))
+}
+
+
+nvec <- c(2,5,10,20,50,100,200,300,400,500)
+s2_vec <- sapply(nvec, s2_fun)
+s2_vec
+bias_vec <-  abs(s2_vec - sigma^2)
+percent_vec <-  bias_vec / sigma^2 * 100
+
+plot(nvec, percent_vec,
+     main = "Sample size vs percent error",
+     xlab = "Sample size",
+     ylab = "Error Percent",
+     col = "MistyRose3",
+     type = "b",
+     pch = 19)
+```
+
+$\text{bias} = \mathbb{E}[\tilde{s}^2] - \sigma^2$
+As sample size increases we have a smaller bias of $s^2$
+
+
+# Problem 2
+
+```{r}
+##Seed and Vector
+set.seed(93415)
+nvec <- c(2,5,10,20,50,100,200,300,400,500)
+
+##Function to estimate theta 
+estimate_theta <- function(n){
+  theta_estimate_storage <- c()
+  
+  for(i in 1:10000){
+    sample <- runif(n, min = 0, max = 1)
+    theta_estimate <- max(sample)
+    theta_estimate_storage[i] <- theta_estimate
+  }
+  return(mean(theta_estimate_storage))
+}
+
+##Calculating average theta estimate 
+theta_estimate_vec <- sapply(nvec, estimate_theta)
+
+##Calculating absolute percent error
+abs_percent_error <- abs(theta_estimate_vec - 1) / 1 * 100
+
+##Plotting absolute percent error vs sample size
+plot(nvec, abs_percent_error,
+     main = "Sample size vs absolute percent error",
+     xlab = "Sample size",
+     ylab = "Absolute Percent Error",
+     col = "MistyRose3",
+     type = "b",
+     pch = 19)
+
+
+```
+The bias of this variable acts like the previous example where with a larger sample size there is a reduced bias
+
+```{r}
+
+set.seed(93415)
+size <- 10
+mu <- 0.5
+theta <- 1
+
+##Function to find simulation mean
+
+theta_fun <- function(size){
+  theta_storage <- c()
+
+  for(i in 1:10000){
+    samp <- runif(size, min = 0, max = theta)
+    xbar <- mean(samp)
+    theta_hat <- 2 * xbar
+    theta_storage[i] <-  theta_hat
+  }
+  return(mean(theta_storage))
+}
+
+
+nvec <- c(2,5,10,20,50,100,200,300,400,500)
+theta_vec <- sapply(nvec, theta_fun)
+bias_vec <-  abs(theta_vec - theta)
+percent_vec <-  bias_vec / theta * 100
+
+plot(nvec, percent_vec,
+     main = "Sample size vs percent error",
+     xlab = "Sample size",
+     ylab = "Error Percent",
+     col = "MistyRose3",
+     type = "b",
+     pch = 19)
+
+
+```
+The estimator does change with changes to sample size

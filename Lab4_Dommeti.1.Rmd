@@ -1,0 +1,204 @@
+---
+title: "Stat 3202 Lab 4"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+
+## Part (a)
+
+An estimator $\hat{\theta}$ is consistent for $\theta$ if it satisfies the following conditions as the sample size $n$ increases:
+
+1)  The estimator is unbiased, meaning that the expected value of the estimator approaches the true value of the parameter as $n$ increases.
+
+2)  The estimator is asymptotically normal, meaning that its distribution approaches a normal distribution as $n$ increases.
+
+3)  The estimator satisfies the weak law of large numbers, meaning that it converges in probability to the true value of the parameter as $n$ increases.
+
+4)  The estimator is uniformly integrable, meaning that its expected value approaches the true value of the parameter as $n$ increases, and it has a bounded tail.
+
+## Part (b)
+
+```{r}
+# Monte Carlo
+set.seed(93415)
+
+# Determinable
+n.max <- 2000
+
+s.storage <- c()
+e.storage <-c()
+
+lambda <- 3
+
+# Every iteration we have a new observation we are adding to our storage 
+#in order to show how the distribution behaves as observations goes up
+for(i in 1:n.max) {
+  
+  new.observation <- rexp(n = 1, lambda)
+  
+  s.storage[i] <- new.observation
+  e.storage[i] <- 1 / mean(s.storage)
+}
+
+plot(e.storage, 
+     type = "l", 
+     col = "MistyRose3",
+     ylab = "Estimator",
+     xlab = "Sample Size")
+abline(h = lambda, col = "grey")
+
+legend("topright", 
+       legend = c("Estimator", "True Parameter"), 
+       col = c("MistyRose3", "grey"), 
+       lty = c(1, 1), 
+       cex = 0.8)
+```
+
+we can see that our estimator $1 / \bar{x}$ converges to the true value of $\lambda$ converges to the true value of $\lambda$. This helps us visualize the fact that the estimtor is consistent after a certain sample size
+
+
+
+# Problem 2
+
+
+```{r}
+# Monte Carlo
+set.seed(93415)
+
+# Determinable
+n.max <- 2000
+
+s.storage <- c()
+e.storage <- c()
+v.storage <- c()
+
+lambda <- 3
+
+# Every iteration we have a new observation we are adding to our storage 
+#in order to show how the distribution behaves as observations goes up
+for(i in 1:n.max) {
+  
+  new.observation <- rpois(n = 1, lambda)
+  
+  s.storage[i] <- new.observation
+  e.storage[i] <- mean(s.storage)
+  v.storage[i] <- var(s.storage)
+}
+
+# Plot the sample mean and sample variance estimates
+plot(e.storage, 
+     type = "l", 
+     col = "MistyRose3",
+     ylab = "Estimator",
+     xlab = "Sample Size",
+     ylim = c(2.5, 3.5),
+     main = "Sample Mean and Sample Variance Estimates")
+lines(v.storage, col = "SteelBlue3")
+abline(h = lambda, col = "grey")
+
+# Add a legend
+legend("topright", 
+       legend = c("Sample Mean", "Sample Variance", "True Parameter"), 
+       col = c("MistyRose3", "SteelBlue3", "grey"), 
+       lty = c(1, 1, 1), 
+       cex = 0.8)
+
+
+```
+
+# Problem 3
+
+```{r}
+# Monte Carlo
+set.seed(93415)
+
+# Determinable
+n.max <- 2000
+
+s.storage <- c()
+e.storage <- c()
+v.storage <- c()
+
+k <- 5
+
+# Every iteration we have a new observation we are adding to our storage 
+#in order to show how the distribution behaves as observations goes up
+for(i in 1:n.max) {
+  
+  new.observation <- rchisq(n = 1, df = k)
+  
+  s.storage[i] <- new.observation
+  e.storage[i] <- mean(s.storage) / k
+  v.storage[i] <- var(s.storage) / (2 * k)
+}
+
+# Plot the sample mean and sample variance estimates
+plot(e.storage, 
+     type = "l", 
+     col = "MistyRose3",
+     ylab = "Estimator",
+     xlab = "Sample Size",
+     main = "Sample Mean and Sample Variance Estimates")
+lines(v.storage, col = "SteelBlue3")
+abline(h = 1, col = "grey")
+
+# Add a legend
+legend("topright", 
+       legend = c("Sample Mean", "Sample Variance", "True Parameter"), 
+       col = c("MistyRose3", "SteelBlue3", "grey"), 
+       lty = c(1, 1, 1), 
+       cex = 0.8)
+
+```
+
+# Problem 4
+
+```{r}
+# Monte Carlo
+set.seed(93415)
+
+# Determinable
+n.max <- 2000
+
+x.storage <- c()
+theta.hat <- c()
+
+theta <- 5
+
+# Every iteration we have a new observation we are adding to our storage 
+#in order to show how the distribution behaves as observations goes up
+for(i in 1:n.max) {
+  
+  new.observation <- runif(n = 1, min = 0, max = theta)
+  
+  x.storage[i] <- new.observation
+  theta.hat[i] <- max(x.storage)
+}
+
+# Plot the estimator theta.hat
+plot(theta.hat, 
+     type = "l", 
+     col = "MistyRose3",
+     ylab = "Estimator",
+     xlab = "Sample Size",
+     ylim = c(4.5, 5.5),
+     main = "Estimator theta.hat of theta")
+abline(h = theta, col = "grey")
+
+# Add a legend
+legend("topright", 
+       legend = c("Estimator theta", "True Parameter theta"), 
+       col = c("MistyRose3", "grey"), 
+       lty = c(1, 1), 
+       cex = 0.8)
+
+
+```
+As $n$ (the sample size) increases, the probability that $\hat{\theta}$ is close to $\theta$ also increases

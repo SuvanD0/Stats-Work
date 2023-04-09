@@ -1,0 +1,259 @@
+---
+title: "Lab 5 Dommeti.1"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+
+# Part (a)
+
+$$L(\mu | x_1, x_2, ..., x_n, \sigma^2) = (2 ^ \pi)^{ -\frac{n}{2} } e^{ -\frac{1}{2}\sum_{i=1}^n (x_i - \mu)^2}$$
+
+## Part (b)
+
+```{r}
+##make a function based of the math we did earlier
+L.normal <- function(mu, obs.data) {
+  n <- length(obs.data)
+  
+  likelihood <- (2*pi)^(-n/2) * exp(-1/2 * sum( (obs.data - mu)^2 ) )
+  
+  return(likelihood)
+}
+
+```
+
+## Part (c)
+
+```{r}
+frogs <- c(4.57, 4.73, 2.24, 4.16, 4.53, 3.79, 2.48, 4.74, 3.18)
+
+xbar <- mean(frogs)
+
+print(xbar)
+```
+
+## Part (d)
+
+```{r}
+mu.domain <- seq(0, 7, by = 0.05)
+
+likelihood.mu.storage <- c()
+
+for(i in 1:length(mu.domain)){
+  
+  likelihood.mu.storage[i]  <- L.normal( mu.domain[i], obs.data = frogs)
+  
+}
+
+plot(mu.domain, likelihood.mu.storage,
+     type = "l",
+     xlab = "mu",
+     ylab = "L ( mu | x, sigma)",
+     main = "Normal Likelihood of Frog Weights",
+     col = "mistyrose3")
+
+##Likelihood estimate is 3.8 
+```
+
+## Part (e)
+
+```{r}
+optimize(f = L.normal,
+         interval = c(0,7),
+         maximum = TRUE,
+         obs.data = frogs)
+```
+
+## Part (f)
+
+"\$maximum" is the value of $\mu$ that maximizes the likelihood function $L (mu | x, \sigma)$
+
+"\$objective" is the value of the likelihood function $L (mu | x, \sigma)$ evaluated at $\mu = 3.824$
+
+## Part (g)
+
+```{r}
+log.L.normal <-  function(mu, obs.data){
+  
+  n <- length(obs.data)
+  
+  likelihood <- (2*pi)^(-n/2) * exp(-1/2 * sum( (obs.data - mu)^2 ) )
+  
+  ##all we have to do is take the log at the end
+  return(log(likelihood))
+}
+
+log.likelihood.mu.storage <- c()
+
+for(i in 1:length(mu.domain)){
+  
+  log.likelihood.mu.storage[i]  <- log.L.normal( mu.domain[i], obs.data = frogs)
+  
+}
+
+plot(mu.domain, log.likelihood.mu.storage,
+     type = "l",
+     xlab = "mu",
+     ylab = "L ( mu | x, sigma)",
+     main = "Log Likelihood of Frog Weights",
+     col = "mistyrose3")
+```
+
+## Part (h)
+
+```{r}
+optimize(f = log.L.normal,
+         interval = c(0,7),
+         maximum = TRUE,
+         obs.data = frogs)
+```
+
+## Part (i)
+
+Because the log function is monotonically increasing
+
+# Problem 2
+
+## Part (a)
+
+The likelihood function for a data set of exponentially distributed random variables with parameter $\lambda$ is:
+
+$$L(\lambda|x_1, x_2, ..., x_n) = \lambda^n e^{-\lambda\sum_{i=1}^{n}x_i}$$
+
+## Part (b)
+
+```{r}
+L.Exponential <- function(lambda, obs.data){
+  n <- length(obs.data)
+  
+  likelihood <- lambda^n * exp(-lambda * sum(obs.data))
+  
+  return(likelihood)
+}
+```
+
+## Part (c)
+
+```{r}
+ mercury <- c(0.51, 0.02, 0.15, 0.46, 0.11, 0.04, 0.39, 0.52, 0.2, 0.17, 0.01, 0.02, 0.32, 1.37)
+
+lambda.MLE <- 1 / mean(mercury)
+
+print(lambda.MLE)
+
+```
+
+## Part (d)
+
+```{r}
+lambda.domain <- seq(0, 10, by = 0.05)
+
+likelihood.lambda.storage <- c()
+
+for(i in 1:length(lambda.domain)){
+  
+  likelihood.lambda.storage[i] <- L.Exponential(lambda.domain[i], obs.data = mercury)
+  
+}
+
+plot(lambda.domain, likelihood.lambda.storage,
+     type = "l",
+     xlab = "lambda",
+     ylab = "L(lambda | x)",
+     main = "Exponential Likelihood of Mercury Concentrations",
+     col = "mistyrose3")
+```
+
+The likelihood function is uni-modal and peaks at around 3, which is consistent with the MLE computed in part (c).
+
+## Part (e)
+
+```{r}
+optimize(f = L.Exponential,
+         interval = c(0, 10),
+         maximum = TRUE,
+         obs.data = mercury)
+```
+
+## Part (f)
+
+```{r}
+log.L.Exponential <- function(lambda, obs.data){
+  n <- length(obs.data)
+  
+  log.likelihood <- n*log(lambda) - lambda*sum(obs.data)
+  
+  return(log.likelihood)
+}
+
+log.likelihood.lambda.storage <- c()
+
+for(i in 1:length(lambda.domain)){
+  
+  log.likelihood.lambda.storage[i] <- log.L.Exponential(lambda.domain[i], obs.data = mercury)
+  
+}
+
+plot(lambda.domain, log.likelihood.lambda.storage,
+     type = "l",
+     xlab = "lambda",
+     ylab = "log L(lambda | x)",
+     main = "Log Likelihood of Mercury Concentrations",
+     col = "mistyrose3")
+
+```
+
+The log-likelihood function is also unimodal and peaks at around 3, which is consistent with the MLE computed in part (c).
+
+## Problem 3 
+
+```{r}
+
+river.data <- c("Safe", "Safe", "Safe", "Safe", "Safe", "Safe", "Safe", "Safe", "Safe", "Flood", "Safe", "Safe", "Safe",
+  "Flood", "Safe", "Safe", "Flood", "Flood", "Safe", "Safe", "Flood", "Safe", "Safe", "Safe", "Safe", "Safe",
+  "Safe", "Safe", "Flood", "Safe")
+
+
+likelihood <- function(p) {
+  prod(ifelse(river.data == "Safe", p, 1-p))
+}
+
+p_seq <- seq(from = 0, to = 1, by = 0.01)
+L <- sapply(p_seq, likelihood)
+plot(p_seq, L, type = "l", xlab = "p", ylab = "Likelihood", main = "Likelihood function for p")
+
+
+
+
+```
+
+```{r}
+MLE <- optimize(f = function(p) -likelihood(p), interval = c(0, 1), maximum = TRUE)
+p_MLE <- MLE$maximum
+p_MLE
+```
+
+The maximum likelihood estimate for p is approximately 0.767. This means that there is a 76.7% chance that the river is at a safe level on any given day. This estimate seems reasonable given that the river is at a safe level for the majority of the 30-day period.
+
+```{r}
+log_likelihood <- function(p) {
+  sum(ifelse(river.data == "Safe", log(p), log(1-p)))
+}
+L_log <- sapply(p_seq, log_likelihood)
+plot(p_seq, L_log, type = "l", xlab = "p", ylab = "Log-Likelihood", main = "Log-Likelihood function for p")
+
+
+MLE_log <- optimize(f = function(p) -log_likelihood(p), interval = c(0, 1), maximum = TRUE)
+p_MLE_log <- MLE_log$maximum
+p_MLE_log
+
+```
+
+The maximum of the log-likelihood function occurs at the same value of p as the maximum of the likelihood function, which is approximately 0.767.

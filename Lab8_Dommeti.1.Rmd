@@ -1,0 +1,163 @@
+---
+title: "Lab9_Dommeti.1"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(DescTools)
+```
+
+# Example 1
+```{r}
+health.dataset <-  read.csv(file = "Health.csv")
+
+pressure <- health.dataset$pressure
+```
+
+## part (a)
+```{r}
+# 2 sided confidence Interval
+alpha <- 0.05
+n <- length(pressure)
+xbar <- mean(pressure)
+s <- sd(pressure)
+
+# based on t in the formula
+t <- qt(1-alpha/2, df = n-1)
+
+# Lower and Upper Bounds
+ci.lower <- xbar - t*s/sqrt(n)
+ci.upper <- xbar + t*s/sqrt(n)
+
+cat("We are 95% confident that the true mean blood pressure for people in Columbus, Ohio is between [", ci.lower, ", ", ci.upper, "]\n mmHg")
+```
+
+## part (b)
+
+### part (I)
+```{r}
+battery.dataset <-  read.csv(file = "Battery.csv")
+
+hours <- battery.dataset$Hours
+
+```
+
+```{r}
+# 1 sided confidence interval
+alpha <- 0.05
+n <- length(hours)
+xbar <- mean(hours)
+s <-sd(hours)
+t <- qt(1-alpha, df = n-1)
+
+ci.lower <- xbar - t*s/sqrt(n)
+# 1 sided so upper is infinity
+ci.upper <- Inf
+
+cat("We are 95% confident that the true mean of hours lasted for a battery is between [", ci.lower, ", ", ci.upper, "]\n hours. In other words, we are 95% confident that the battery lasts at least", ci.lower, "hours")
+```
+
+### part(II)
+
+```{r}
+output <- t.test(hours, conf.level = 1-alpha, alternative = "greater")
+output$conf.int
+```
+
+### part(III)
+
+```{r}
+set.seed(777)
+mu <- 15
+sigma <- 2
+n <- 20
+
+alpha <- 0.05
+coverage <- c()
+
+for(i in 1:20000) {
+  samp <- rnorm(n, mean = mu, sd = sigma)
+  
+  output <- t.test(samp, conf.level = 1-alpha, alternative = "greater")
+  
+  ci.lower <- output$conf.int[1]
+  ci.upper <- Inf
+  
+  coverage[i] <- ci.lower <= mu
+  
+}
+
+coverage.rate <- mean(coverage)
+
+
+cat("The coverage rate for this one sided lower confidence interval was", coverage.rate)
+```
+
+# Question 2
+
+## part (a)
+
+```{r}
+chip_weight.dataset <-  read.csv(file = "chip_weight.csv")
+weight <- chip_weight.dataset$weight
+```
+
+
+
+```{r}
+# Calculate sample variance and sample standard deviation
+n <- length(weight)
+s2 <- var(weight)
+s <- sqrt(s2)
+
+# Set confidence level and alpha
+conf_level <- 0.95
+alpha <- 1 - conf_level
+
+# Calculate critical value based on chi-square distribution for upper one-sided test
+critical_value <- qchisq(1 - alpha, df = n - 1)
+
+# Calculate confidence interval for variance
+ci_var_lower <- ((n - 1) * s2) / critical_value
+
+# Calculate confidence interval for standard deviation
+ci_sd_lower <- sqrt(ci_var_lower)
+
+cat("Upper one-sided", conf_level*100, "% confidence interval for population variance: [", ci_var_lower, ", Inf)\n")
+cat("Upper one-sided", conf_level*100, "% confidence interval for population standard deviation: [", ci_sd_lower, ", Inf)\n")
+```
+
+
+```{r}
+set.seed(777)
+mu <- 15
+sigma <- 2
+n <- 20
+
+alpha <- 0.05
+coverage <- c()
+
+for(i in 1:20000) {
+  samp <- rnorm(n, mean = mu, sd = sigma)
+  
+  output <- t.test(samp, conf.level = 1-alpha, alternative = "greater")
+  
+  ci.lower <- output$conf.int[1]
+  ci.upper <- Inf
+  
+  coverage[i] <- ci.lower <= mu
+  
+}
+
+coverage.rate <- mean(coverage)
+
+cat("The coverage rate for this one-sided lower confidence interval was", coverage.rate)
+
+```
+
+
+
+

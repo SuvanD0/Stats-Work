@@ -1,0 +1,171 @@
+---
+title: "Lab 7"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Gudied Example 1
+
+## part (a)
+
+Our $(1-\alpha2)\%$ cofidence interval for $\mu$ is:
+
+$$\bar x - t_{(1-\alpha/2, n-1)} \frac{s}{\sqrt n} \leq \mu \leq \bar x + t_{(1-\alpha/2, n-1)} \frac{s}{\sqrt n}$$
+
+## part (b)
+
+```{r}
+set.seed(444)
+
+
+mu <- 10
+sigma <- 3
+n <- 5
+alpha <- 0.01
+
+coverage <- c()
+
+for(i in 1:10000) {
+  samp <- rnorm(n, mean = mu, sd = sigma)
+
+  xbar <- mean(samp)
+  s <- sd(samp)
+  t <- qt(1-alpha/2, n-1)
+
+  ci.lower <- xbar - t*s/sqrt(n)
+  ci.upper <- xbar + t*s/sqrt(n)
+
+  coverage[i] <- ci.lower <= mu & mu <= ci.upper
+}
+
+mean(coverage)
+```
+
+The coverage rate for these intervals is about 90%, which is what we expect
+
+## part (c)
+
+```{r}
+set.seed(333)
+
+mu <- 10
+sigma <- 3
+n <- 50
+alpha <- 0.01
+
+coverage <- c()
+
+for (i in 1:10000){
+  samp <- rnorm(n, mean = mu, sd = sigma)
+
+  output <- t.test(samp, conf.level = 1 - alpha)
+
+  ci.lower <- output$conf.int[1]
+  ci.upper <- output$conf.int[2]
+
+  coverage[i] <- ci.lower <= mu & mu <= ci.upper
+}
+
+mean(coverage)
+```
+
+Even though we changed the sample size from 5 to 5, the coverage rate remained the same as 99%, thus size does not affet the rate
+
+## part (d)
+
+```{r}
+set.seed(123)
+
+sigma <- 3
+n <- 50
+alpha <- 0.05
+
+mus <- seq(0, 20, by = 0.5)
+coverages <- c()
+
+for (mu in mus){
+  coverage <- c()
+  
+  for (i in 1:10000){
+    samp <- rnorm(n, mean = mu, sd = sigma)
+
+    output <- t.test(samp, conf.level = 1 - alpha)
+
+    ci.lower <- output$conf.int[1]
+    ci.upper <- output$conf.int[2]
+
+    coverage[i] <- ci.lower <= mu & mu <= ci.upper
+  }
+
+  coverages <- c(coverages, mean(coverage))
+}
+
+plot(mus, coverages, type = "l", xlab = "mu", ylab = "Coverage rate")
+abline(h = 1-alpha, col = "red")
+
+```
+
+# Problem 2
+
+## part (a)
+
+```{r}
+set.seed(667)
+library(DescTools)
+
+n <- 40
+p <- 0.70
+
+alpha <- 0.05
+
+
+x <- rbinom(1, size = n,prob = p)
+
+output <- BinomCI(x, n, conf.level = 1-alpha, method = "wald")
+
+output[2]
+output[3]
+```
+
+## part (b)
+
+```{r}
+# Wald method (from part a)
+output_wald <- BinomCI(x, n, conf.level = 1-alpha, method = "wald")
+cov_wald <- (output_wald[2] <= p) & (output_wald[3] >= p)
+
+# Other methods
+output_wp <- BinomCI(x, n, conf.level = 1-alpha, method = "wilson")
+cov_wp <- (output_wp[2] <= p) & (output_wp[3] >= p)
+
+output_wc <- BinomCI(x, n, conf.level = 1-alpha, method = "waldcc")
+cov_wc <- (output_wc[2] <= p) & (output_wc[3] >= p)
+
+output_wpcc <- BinomCI(x, n, conf.level = 1-alpha, method = "wilsoncc")
+cov_wpcc <- (output_wpcc[2] <= p) & (output_wpcc[3] >= p)
+
+output_ac <- BinomCI(x, n, conf.level = 1-alpha, method = "agresti-coull")
+cov_ac <- (output_ac[2] <= p) & (output_ac[3] >= p)
+
+# Print coverage for all methods
+cat("Wald method coverage:", cov_wald, "\n")
+cat("Wilson method coverage:", cov_wp, "\n")
+cat("Wald with continuity correction method coverage:", cov_wc, "\n")
+cat("Wilson with continuity correction method coverage:", cov_wpcc, "\n")
+cat("Agresti-Coull method coverage:", cov_ac, "\n")
+
+# Output the confidence intervals for each method
+cat("Wald method confidence interval:", output_wald[2], output_wald[3], "\n")
+cat("Wilson method confidence interval:", output_wp[2], output_wp[3], "\n")
+cat("Wald with continuity correction method confidence interval:", output_wc[2], output_wc[3], "\n")
+cat("Wilson with continuity correction method confidence interval:", output_wpcc[2], output_wpcc[3], "\n")
+cat("Agresti-Coull method confidence interval:", output_ac[2], output_ac[3], "\n")
+
+```
+
