@@ -1,0 +1,247 @@
+---
+title: "Lab10_Dommeti.1"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# Example 1 - Hypothesis Testing
+
+```{r}
+# provided code
+library(readr)
+vanillin <- c(38,46,41,36,42,40,34,41,33,
+  46,41,39,44,45,41,37,39,36,
+  40,43,37,41,39,36,47,36,41,
+  38,38,38,33,39,41,36,38,44,39)
+
+mean(vanillin)
+
+```
+
+## Method 1: Preforming the Hypothesis Test using a Confidence Interval
+
+Test $H_O:\mu = 42$ vs. $H_1:\mu \neq 42$ at significance level $\alpha$ = 0.01. In other words, we are going to construct a 99% confidence interval for $\mu$
+
+```{r}
+alpha <- 0.01
+n <- length(vanillin)
+xbar <- mean(vanillin)
+sigma <- 3.52 #given
+
+z <- qnorm(1-alpha/2)
+
+ci.lower <- xbar - z*sigma/sqrt(n)
+ci.upper <- xbar + z*sigma/sqrt(n)
+
+cat("We are 99% confident that the true mean vannilan level of this batch is between", ci.lower, "and", ci.upper)
+
+```
+
+
+Since 42 is not contained within this confidence interval we reject the null hypothesis $H_O$, We conclude that the true mean vanilla level is statistically significantly different from 42 ppt.
+
+## Method 2: Testing using Rejection Regions
+
+Test $H_O:\mu = 42$ vs. $H_1:\mu \neq 42$ at significance level $\alpha$ = 0.01. We will being using a z test statistic. Under the null hypothesis, this test statistic $Z$ follows the distribution $Z\sim N(0,1)$
+
+We reject the null hypothesis when the test statistic $Z_{obv}$ is either to high or too low
+
+```{r}
+alpha <- 0.01
+
+rr.lower <- qnorm(alpha/2)
+rr.upper <- qnorm(1-alpha/2)
+
+cat("the rejection region is (", Inf, "to", rr.lower, "] and [", rr.upper, "to", Inf, ")")
+```
+
+
+We would reject the null hypothesis when our observed test statistic falls within either of these two regions. 
+
+```{r}
+z_obs <- (xbar - 42) / (sigma / sqrt(n))
+```
+
+We observe that $z_obs$ = -4.25. Since this falls within the rejection region, we must reject the null hypothesis $H_0$. We conclude the alternative hypotheses, which is that $\mu \neq 42$.
+The true mean vannilan level is statistically significantly different than 42 ppt
+
+
+## Method 3: Using the z-test function
+
+```{r}
+library(DescTools)
+
+ZTest(vanillin, alternative = "two.sided", mu = 42, sd_pop = 3.52, conf.level = 1-alpha)
+
+```
+
+# Problem 2
+
+```{r}
+
+# provided parameters
+mu0 <- 42 
+alpha <- 0.01 
+
+# calculate sample statistics
+n <- length(vanillin)
+xbar <- mean(vanillin)
+s <- sd(vanillin)
+
+# calculate t statistic
+t_obs <- (xbar - mu0) / (s / sqrt(n))
+
+# calculate critical value for two-sided test
+t_critical <- qt(1 - alpha/2, df = n-1)
+
+cat("Calculated t statistic (t_obs):", t_obs)
+cat("\n", "Critical value for two-sided test (t_critical):", t_critical)
+
+cat("\n")
+# perform hypothesis test (this is a more automated way of doing it)
+if (abs(t_obs) > t_critical) {
+  cat("Reject the null hypothesis H0: mu = mu_0")
+} else {
+  cat("Fail to reject the null hypothesis H0: mu = mu_0")
+}
+
+
+```
+
+
+# Problem 3
+
+## part (a)
+
+The test statistic we would use for this hypothesis test is the t-statistic, since the population variance is assumed to be unknown. The t-statistic is given by:
+
+$t = \frac{xbar - \mu_0}{s / \sqrt{n}}$
+
+where xbar is the sample mean, $\mu_0$ is the hypothesized population mean (in this case, $\mu_0$ = 8), s is the sample standard deviation, and n is the sample size (in this case, n = 30).
+
+## part (b)
+
+```{r}
+# Given parameters
+mu <- 8 # hypothesized population mean
+sigma <- 1 # population standard deviation
+n <- 30 # sample size
+alpha <- 0.05 # significance level
+
+# Calculate critical value for one-sided test
+t_critical <- qt(alpha, df = n-1)
+
+cat("Critical value for rejection region (t_critical):", t_critical)
+
+```
+
+## part (c)
+
+```{r}
+# Generate a large number of samples
+n_samples <- 10000
+test_statistics <- numeric(n_samples)
+
+for (i in 1:n_samples) {
+  # Generate sample data
+  sample_data <- rnorm(n, mean = mu, sd = sigma)
+  
+  # Calculate sample statistics
+  xbar <- mean(sample_data)
+  s <- sd(sample_data)
+  
+  # Calculate test statistic
+  test_statistics[i] <- (xbar - mu) / (s / sqrt(n))
+}
+
+```
+
+
+## part(d)
+
+```{r}
+# Count proportion of test statistics in rejection region
+proportion_rejection <- mean(test_statistics < t_critical)
+
+cat("Proportion of test statistics in rejection region:", proportion_rejection)
+
+cat("\n")
+
+
+if (proportion_rejection > alpha) {
+  cat(" The test statistics are falling in the rejection region more frequently than expected by chance, indicating rejection of the null hypothesis.")
+} else {
+  cat(" The test statistics are not falling in the rejection region more frequently than expected by chance, indicating failure to reject the null hypothesis.")
+}
+
+```
+
+
+## part (e)
+
+```{r}
+# Plot histogram of test statistics
+hist(test_statistics, freq = FALSE, main = "Sampling Distribution of Test Statistics",
+     xlab = "Test Statistic", ylab = "Density", col = "mistyrose3")
+lines(density(test_statistics), lwd = 2)
+abline(v = t_critical, col = "red", lty = 2)
+legend("topright", legend = c( "Critical Value"), lwd = c(2), col = c("red"), lty = c(2))
+
+```
+
+# Problem 4 (Using this one as notes/refernce for midterm)
+
+```{r}
+library(stats)
+
+
+n <- 19                 # Sample size
+mu <- 8                 # Population mean
+sigma <- 1              # Population standard deviation
+alpha <- 0.01           # Significance level
+
+# Compute critical value
+df <- n - 1             # Degrees of freedom for chi-squared distribution
+chi_critical <- qchisq(1 - alpha, df)
+
+# Generate samples and compute test statistic
+num_samples <- 10000    # Number of samples for Monte Carlo simulation
+test_statistics <- numeric(num_samples)  # Store test statistics
+
+for (i in 1:num_samples) {
+  # Generate sample from N(mu, sigma)
+  sample <- rnorm(n, mean = mu, sd = sigma)
+  
+  # Compute sample variance
+  sample_variance <- var(sample)
+  
+  # Compute test statistic
+  test_statistic <- (n - 1) * sample_variance / sigma^2
+  
+  # Store test statistic
+  test_statistics[i] <- test_statistic
+}
+
+# Compute proportion of test statistics in rejection region
+proportion_rejection <- mean(test_statistics > chi_critical)
+
+# Print results
+cat("Rejection region proportion:", proportion_rejection, "\n")
+
+# Plot sampling distribution
+hist(test_statistics, freq = FALSE, col = "mistyrose3", border = "black",
+     main = "Sampling Distribution of Test Statistics",
+     xlab = "Test Statistic", ylab = "Density")
+curve(dchisq(x, df), add = TRUE, col = "red", lwd = 2, n = 1000)
+legend("topright", legend = c("Sampling Distribution", "Chi-squared Distribution"),
+       col = c("mistyrose3", "red"), lwd = c(1, 2), bg = "white")
+
+```
+
