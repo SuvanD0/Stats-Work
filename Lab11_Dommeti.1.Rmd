@@ -1,0 +1,198 @@
+---
+title: "Lab11_Dommeti.1"
+author: "Suvan Dommeti"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyverse)
+```
+
+
+## Example 1
+
+```{r}
+batch1 <- c(38,46,41,36,42,40,34,41,33,
+46,41,39,44,45,41,37,39,36,
+40,43,37,41,39,36,47,36,41,
+38,38,38,33,39,41,36,38,44,39)
+batch2=c(42, 37, 40, 39 ,45, 31, 45, 36, 37, 38,
+41, 35, 46, 41, 44, 37, 38, 39, 38, 38,
+42, 44,45, 35, 35, 42, 36, 40)
+```
+
+
+Hypothesis: We want to test $H_0: \mu_1 - \mu_2 = 0$ vs. $H_1: \mu_1 - \mu_2 \neq 0$ at a significance level of $\alpha = 0.01$
+
+## part (a)
+
+$$Z = \frac{(\bar x_1- \bar x_2) - 0}{ \sqrt{\frac{\sigma_1^2}{n_1} + \frac{\sigma_2^2}{n_2} }}$$
+
+## part (b)
+
+Under the null hypothesis, the sampling distribution of this test statistic is $Z \sim N(0,1)$
+
+## part (c)
+
+```{r}
+xbar1 <- mean(batch1)
+xbar2 <- mean(batch2)
+
+n1 <-  length(batch1)
+n2 <-  length(batch2)
+
+sigma1 <-  3.5
+sigma2 <-  3.5
+
+Z.obs <- (xbar1 - xbar2) / sqrt(sigma1^2/n1 + sigma2^2/n2)
+Z.obs
+```
+Our observed test statistic is 0.04624286
+
+## part (d)
+
+```{r}
+alpha <- 0.01
+
+rr1 <- qnorm(alpha/2)
+rr2 <- qnorm(1-alpha/2)
+
+c(-Inf, rr1)
+
+c(rr2, Inf)
+```
+
+Our rejection regions are $(-\infty, -2.58)$ and $(2.58, \infty)$.
+
+We fail to reject the null hypothesis as it is not contained within either of our rejection regions. 
+
+We conclude that there is no significant significant difference in Vannlin levels between batch 1 and batch 2
+
+## part (e)
+
+we will construct a 99% confidence interval for $\mu_1 - \mu_2$
+
+```{r}
+z.quant <- qnorm(1-alpha/2)
+
+ci.lower <- (xbar1 - xbar2) - z.quant * sqrt(sigma1^2/n1 + sigma2^2/n2) 
+ci.upper <- (xbar1 - xbar2) + z.quant * sqrt (sigma1^2/n1 + sigma2^2/n2)
+c(ci.lower, ci.upper)
+
+```
+
+
+we are 99% confident that the true difference in mean vanillin levels between batches 1 and 2 is between $-2.22$ and $2.30$ ppt.
+
+Since 0 is contained within our confidence interval we fail to reject the null hypothesis
+
+we conclude that there is no statistically significant difference in vanillin levels between batch 1 and batch 2
+
+## part (f)
+
+```{r}
+Z.obs
+
+p <-pnorm(Z.obs, lower.tail = FALSE) * 2
+p
+```
+Our p-value is $0.96$. Since our p value is greater than $\alpha = 0.01$ we fail to reject the null hypothesis
+
+we conclude that there is no statistically significant difference in vanillin levels between batch 1 and batch 2
+
+## part (g)
+
+Verify the answer
+```{r}
+library(DescTools)
+ZTest(batch1, batch2, alternative = "two.sided", mu = 0, sd_pop = 3.5, conf.level = 0.99)
+
+```
+
+## Question 2
+
+Firstly, we need to test whether the variances of the two samples are equal using the F-test. The null hypothesis for the F-test is that the variances are equal between the two samples, and the alternative hypothesis is that they are not equal. The significance level is 0.05.
+
+```{r}
+
+batch1 <- c(38,46,41,36,42,40,34,41,33,46,41,39,44,45,41,37,39,36,40,43,37,41,39,36,47,36,41,38,38,38,33,39,41,36,38,44,39)
+batch2 <- c(42, 37, 40, 39 ,45, 31, 45, 36, 37, 38, 41, 35, 46, 41, 44, 37, 38, 39, 38, 38, 42, 44,45, 35, 35, 42, 36, 40)
+
+var.test(batch1, batch2)
+
+```
+
+Next, we can use the two-sample t-test assuming equal variances to test the hypothesis. The null hypothesis is that the mean difference between the two batches is zero, and the alternative hypothesis is that the mean difference is not zero. The significance level is 0.01.
+
+```{r}
+t.test(batch1, batch2, var.equal = TRUE, mu = 0, conf.level = 0.99)
+```
+```{r}
+se <- sqrt(var(batch1)/length(batch1) + var(batch2)/length(batch2))
+z <- (mean(batch1) - mean(batch2) - 0) / se
+z
+
+```
+
+We can also compute the p-value using the z-distribution.
+
+```{r}
+2 * pnorm(-abs(z))
+```
+This is consistent with previous answer
+
+Therefore, based on the F-test, two-sample t-test, and z-test, we fail to reject the null hypothesis that the mean difference between the two batches is zero. We can conclude that there is no significant difference in the mean Vanillin content between batch 1 and batch 2.
+
+## part (a)
+
+The test statistic that would be used for this hypothesis is the two-sample t-test
+
+## part (b)
+
+The sampling distribution of the test statistic is a t-distribution with degrees of freedom equal to the smaller of n1-1 and n2-1, where n1 and n2 are the sample sizes of the two groups.
+
+## part (c)
+
+```{r}
+
+s1 <- sd(batch1)
+s2 <- sd(batch2)
+
+t_obs <- (mean(batch1) - mean(batch2)) / sqrt(s1^2/length(batch1) + s2^2/length(batch2))
+t_obs
+
+```
+With a two-sided hypothesis and a significance level of $\alpha = 0.01$, the rejection region is any value less than or equal to $-t_{\nu,\alpha/2}$ or greater than or equal to $t_{\nu,\alpha/2}$, where $t_{\nu,\alpha/2}$ is the $\alpha/2$ percentile of the t-distribution with degrees of freedom $\nu$. To compute the rejection region, we first need to calculate the degrees of freedom:
+
+```{r}
+nu <- ((s1^2/length(batch1) + s2^2/length(batch2))^2) / ((s1^2/length(batch1))^2/(length(batch1)-1) + (s2^2/length(batch2))^2/(length(batch2)-1))
+nu
+
+```
+```{r}
+alpha <- 0.01
+t_crit <- qt(alpha/2, nu)
+lower <- -t_crit
+upper <- t_crit
+c(lower, upper)
+
+```
+## part (e)
+The test statistic computed in part (c) is t_obs = -0.963, which falls outside of the rejection region. Therefore, we fail to reject the null hypothesis and conclude that there is not enough evidence to suggest that batch 1 and batch 2 have significantly different mean Vanillin contents.
+
+## part (f)
+
+The degrees of freedom for the t-distribution are calculated to be 46.23 using the previously computed values of the sample standard deviations and sample sizes. However, since degrees of freedom must be integers, we use the closest integer value, which is 46.
+
+## part (g)
+
+The p-value for the two-sided t-test can be computed using the t-distribution with 46 degrees of freedom and the absolute value of the t_obs value from part (c). Using R, the p-value is calculated as follows:
+```{r}
+2 * pt(-abs(t_obs), df = 46)
+
+```
+
+
